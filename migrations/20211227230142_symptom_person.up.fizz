@@ -1,0 +1,6 @@
+create_table("symptom_person") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("person_id", "uuid", {})
+	t.Column("symptom_id", "uuid", {})
+	t.Timestamps()
+}

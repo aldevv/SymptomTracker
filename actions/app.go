@@ -1,6 +1,7 @@
 package actions
 
 import (
+	// "github.com/dgrijalva/jwt-go"
 	"symptoms_tracker/locales"
 	"symptoms_tracker/models"
 
@@ -11,6 +12,7 @@ import (
 	forcessl "github.com/gobuffalo/mw-forcessl"
 	i18n "github.com/gobuffalo/mw-i18n/v2"
 	paramlogger "github.com/gobuffalo/mw-paramlogger"
+	tokenauth "github.com/gobuffalo/mw-tokenauth"
 	"github.com/gobuffalo/x/sessions"
 	"github.com/rs/cors"
 	"github.com/unrolled/secure"
@@ -45,6 +47,8 @@ func App() *buffalo.App {
 			},
 			SessionName: "_symptoms_tracker_session",
 		})
+		// load .env file
+		envy.Load()
 
 		// Automatically redirect to SSL
 		app.Use(forceSSL())
@@ -60,6 +64,16 @@ func App() *buffalo.App {
 		// Remove to disable this.
 		app.Use(popmw.Transaction(models.DB))
 		app.GET("/", HomeHandler)
+
+		auth := app.Group("/auth/")
+		auth.POST("register", RegisterHandler)
+		auth.POST("login", LoginHandler)
+
+		// These endpoints need authentication
+		users := app.Group("/users/")
+		users.Use(tokenauth.New(tokenauth.Options{}))
+		users.GET("/symptoms", ListSymptoms)
+		users.POST("/symptoms", CreateSymptom)
 	}
 
 	return app

@@ -1,0 +1,5 @@
+create_table("symptom") {
+	t.Column("id", "uuid", {primary: true})
+	t.Column("content", "string", {null: true})
+	t.Timestamps()
+}
